@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Result</title>
+</head>
+<body>
+  <h2>Uploaded File Information</h2>
+  <ul>
+    <li><strong>Filename:</strong> <span id="fileName">-</span></li>
+    <li><strong>Size:</strong> <span id="fileSize">-</span></li>
+    <li><strong>MIME Type:</strong> <span id="fileType">-</span></li>
+  </ul>
+
+  <h3>File Content Preview:</h3>
+  <pre id="fileContent" style="white-space: pre-wrap; background: #f0f0f0; padding: 10px; border: 1px solid #ccc;">(No content)</pre>
+
+  <script>
+    const name = localStorage.getItem('uploadedFileName') || '(none)';
+    const size = localStorage.getItem('uploadedFileSize') || '(unknown)';
+    const type = localStorage.getItem('uploadedFileType') || '(unknown)';
+    const content = localStorage.getItem('uploadedFileContent') || '(No content loaded or file unreadable)';
+
+    document.getElementById('fileName').textContent = name;
+    document.getElementById('fileSize').textContent = `${Number(size).toLocaleString()} bytes`;
+    document.getElementById('fileType').textContent = type;
+    document.getElementById('fileContent').textContent = content;
+  </script>
+</body>
+</html>

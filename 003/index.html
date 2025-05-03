@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OTP Input</title>
+  <style>
+    .otp-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 40px;
+    }
+
+    .otp-input {
+      width: 40px;
+      height: 50px;
+      text-align: center;
+      font-size: 24px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .otp-input2 {
+      width: 240px;
+      height: 50px;
+      text-align: center;
+      font-size: 24px;
+      border: 2px solid #ccc;
+      border-redius: 8px;
+    }
+
+    .otp-input:focus {
+      border-color: #007bff;
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="otp-container">
+  <input class="otp-input" type="text" maxlength="1" inputmode="numeric" />
+  <input class="otp-input" type="text" maxlength="1" inputmode="numeric" />
+  <input class="otp-input" type="text" maxlength="1" inputmode="numeric" />
+  <input class="otp-input" type="text" maxlength="1" inputmode="numeric" />
+  <input class="otp-input" type="text" maxlength="1" inputmode="numeric" />
+  <input class="otp-input" type="text" maxlength="1" inputmode="numeric" />
+</div>
+
+<div class="otp-container">
+  <input class="otp-input2" type="text" minlength="6" maxlength="6" inputmode="numeric" />
+</div>
+<script>
+  const inputs = document.querySelectorAll('.otp-input');
+
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      const value = e.target.value;
+      if (value.length === 1 && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && !input.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+
+    input.addEventListener('paste', (e) => {
+      const pasteData = e.clipboardData.getData('text');
+      if (/^\d{6}$/.test(pasteData)) {
+        pasteData.split('').forEach((digit, i) => {
+          if (inputs[i]) inputs[i].value = digit;
+        });
+        inputs[5].focus();
+        e.preventDefault();
+      }
+    });
+  });
+</script>
+
+</body>
+</html>

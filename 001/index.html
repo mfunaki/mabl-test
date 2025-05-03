@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Cat</title>
+</head>
+<body>
+    <!-- Link to display the image -->
+    <a href="image_cat.png" target="_blank">View Cat Image</a>
+    <br><br>
+    <!-- Button to download the image -->
+    <button id="btn_download_image" onclick="downloadImage()">Download Cat Image</button>
+
+    <script>
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.href = 'image_cat.png';
+            link.download = 'image_cat.png';
+            link.click();
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload File</title>
+</head>
+<body>
+  <h2>Select File to Upload</h2>
+  <form id="uploadForm">
+    <input type="file" id="fileInput" name="upload" /><br><br>
+    <button type="submit">Submit</button>
+  </form>
+
+  <script>
+    document.getElementById('uploadForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const file = document.getElementById('fileInput').files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function () {
+          localStorage.setItem('uploadedFileName', file.name);
+          localStorage.setItem('uploadedFileSize', file.size);
+          localStorage.setItem('uploadedFileType', file.type);
+          localStorage.setItem('uploadedFileContent', reader.result);
+          window.location.href = 'result.html';
+        };
+        reader.onerror = function () {
+          alert("Failed to read file content.");
+        };
+
+        // Read as text (works best for .txt/.csv/.json/.md)
+        reader.readAsText(file);
+      } else {
+        alert("No file selected.");
+      }
+    });
+  </script>
+</body>
+</html>
