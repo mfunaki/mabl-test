@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  mabl-test:
+    image: nginx:alpine
+    container_name: static_site_dev
+    
+    volumes:
+      # ワークスペース全体をマウント
+      - ..:/workspace:cached
+      # 静的ファイルをNginxのWebルートにマウント
+      - ..:/usr/share/nginx/html:ro
+      
+    ports:
+      - "8083:80"
+      
+    # Dev Container用の設定: コンテナを起動し続ける
+    command: sh -c "nginx && tail -f /dev/null"
+    
+    # 開発時の環境変数
+    environment:
+      - TZ=Asia/Tokyo

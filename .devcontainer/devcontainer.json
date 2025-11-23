@@ -1,0 +1,41 @@
+{
+	"name": "MABL Test - Static Site Development",
+	"dockerComposeFile": "docker-compose.yml",
+	"service": "mabl-test",
+	"workspaceFolder": "/workspace",
+
+	// 開発に便利な拡張機能
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"ms-azuretools.vscode-docker",
+				"formulahendry.auto-close-tag",
+				"formulahendry.auto-rename-tag",
+				"ritwickdey.LiveServer",
+				"ecmel.vscode-html-css"
+			],
+			"settings": {
+				"editor.formatOnSave": true,
+				"editor.defaultFormatter": "esbenp.prettier-vscode",
+				"files.eol": "\n"
+			}
+		}
+	},
+
+	// コンテナ作成後に実行するコマンド
+	"postCreateCommand": "echo 'Dev Container Ready! Open http://localhost:8083 in your browser.'",
+
+	// ポートフォワーディング
+	"forwardPorts": [8083],
+	"portsAttributes": {
+		"8083": {
+			"label": "Static Site",
+			"onAutoForward": "notify"
+		}
+	},
+
+	// コンテナ内でrootユーザーとして実行
+	"remoteUser": "root"
+}
