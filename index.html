@@ -36,6 +36,29 @@
             bottom: 0;
             width: 100%;
         }
+        .menu {
+            margin-top: 30px;
+            text-align: left;
+        }
+        .menu ul {
+            list-style: none;
+            padding: 0;
+        }
+        .menu li {
+            margin: 12px 0;
+        }
+        .menu a {
+            display: block;
+            padding: 12px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+        }
+        .menu a:hover {
+            background-color: #2980b9;
+        }
     </style>
 </head>
 <body>
@@ -45,6 +68,18 @@
     <div class="container">
         <h1>ようこそ mabl-test へ</h1>
         <p>このサイトはテスト用のシンプルなデザインです。</p>
+
+        <nav class="menu">
+            <ul>
+                <li><a href="001/">001 - 画像表示・ダウンロード</a></li>
+                <li><a href="002/">002 - テーブル表示 (5x5)</a></li>
+                <li><a href="003/">003 - OTP入力フィールド</a></li>
+                <li><a href="004/">004 - ファイルアップロード</a></li>
+                <li><a href="005/">005 - Basic認証UI</a></li>
+                <li><a href="006/">006 - 複数テキスト入力</a></li>
+                <li><a href="007/">007 - テキストエディタ・サンプル</a></li>
+            </ul>
+        </nav>
     </div>
 
     <footer>&copy; 2025 mabl-test. All rights reserved.</footer>

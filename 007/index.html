@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テキストエディタ・サンプル</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+            padding: 32px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+
+        .header img {
+            border-radius: 8px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .section {
+            margin-bottom: 24px;
+        }
+
+        .section-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            height: 160px;
+            padding: 16px;
+            font-size: 14px;
+            font-family: inherit;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        }
+
+        .button-panel {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+
+        button {
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: 500;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: #fff;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .clear-panel {
+            padding-top: 16px;
+            border-top: 1px solid #e8e8e8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="icon.png" alt="Icon" width="40" height="40">
+            <h1>テキストエディタ・サンプル</h1>
+        </div>
+
+        <div class="section">
+            <div class="section-label">メインテキストエリア</div>
+            <textarea id="main-input" placeholder="ここにテキストを入力..."></textarea>
+        </div>
+
+        <div class="button-panel">
+            <button class="btn-primary" id="btn-sample1">日本語サンプル1</button>
+            <button class="btn-primary" id="btn-sample2">日本語サンプル2（全角空白）</button>
+            <button class="btn-primary" id="btn-sample3">English Sample</button>
+        </div>
+
+        <div class="section">
+            <div class="section-label">サブテキストエリア</div>
+            <textarea id="sub-input" placeholder="ここにテキストを入力..."></textarea>
+        </div>
+
+        <div class="clear-panel button-panel">
+            <button class="btn-primary" id="btn-copy">上段の内容を下段にコピー</button>
+            <button class="btn-danger" id="btn-clear">下段の内容を全削除</button>
+        </div>
+    </div>
+
+    <script>
+        const mainInput = document.getElementById('main-input');
+        const subInput = document.getElementById('sub-input');
+
+        const sampleTexts = {
+            sample1: `これは日本語のサンプルテキストです。
+テキストエディタの動作確認に使用します。
+複数行にわたる文章を入力することで、
+改行の処理が正しく行われているか
+確認することができます。`,
+
+            sample2: `　これは行頭に全角空白を含むサンプルです。
+　日本語の文章では段落の始まりに
+　全角空白を入れることがあります。
+　このサンプルでは各行の先頭に
+　全角空白が挿入されています。`,
+
+            sample3: `This  is an English sample text.
+It contains multiple lines with spaces.
+The text editor should handle line breaks
+and whitespace characters properly.
+Thank you for testing this application.`
+        };
+
+        document.getElementById('btn-sample1').addEventListener('click', () => {
+            mainInput.value = sampleTexts.sample1;
+        });
+
+        document.getElementById('btn-sample2').addEventListener('click', () => {
+            mainInput.value = sampleTexts.sample2;
+        });
+
+        document.getElementById('btn-sample3').addEventListener('click', () => {
+            mainInput.value = sampleTexts.sample3;
+        });
+
+        document.getElementById('btn-copy').addEventListener('click', () => {
+            subInput.value = mainInput.value;
+        });
+
+        document.getElementById('btn-clear').addEventListener('click', () => {
+            subInput.value = '';
+        });
+    </script>
+</body>
+</html>
