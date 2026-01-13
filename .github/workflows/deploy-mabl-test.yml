@@ -43,7 +43,7 @@ jobs:
 
       - name: Build and push Docker image
         run: |
-          IMAGE_NAME="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/mabl-test/${{ env.SERVICE_NAME }}:${{ github.sha }}"
+          IMAGE_NAME="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/mabl-test-repo/${{ env.SERVICE_NAME }}:${{ github.sha }}"
           docker build -t $IMAGE_NAME .
           docker push $IMAGE_NAME
           echo "IMAGE_NAME=$IMAGE_NAME" >> $GITHUB_ENV
