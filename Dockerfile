@@ -9,5 +9,6 @@ COPY 005/ /usr/share/nginx/html/005/
 COPY 006/ /usr/share/nginx/html/006/
 COPY 007/ /usr/share/nginx/html/007/
 COPY 008/ /usr/share/nginx/html/008/
+COPY 009/ /usr/share/nginx/html/009/
 
 EXPOSE 80

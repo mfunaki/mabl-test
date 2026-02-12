@@ -14,6 +14,7 @@ on:
       - '006/**'
       - '007/**'
       - '008/**'
+      - '009/**'
       - 'Dockerfile'
       - 'docker-compose.yml'
       - '.github/workflows/deploy-mabl-test.yml'

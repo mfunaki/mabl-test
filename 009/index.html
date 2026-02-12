@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>009 - タブオーダーチェック</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #555;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: inline-block;
+            width: 150px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        input[type="number"],
+        select,
+        textarea {
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            width: 300px;
+            font-size: 14px;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus,
+        button:focus {
+            outline: 3px solid #3498db;
+            outline-offset: 2px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .custom-order {
+            background-color: #fff3cd;
+        }
+        .custom-order h2 {
+            border-bottom-color: #ff9800;
+        }
+        .info {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-left: 4px solid #4caf50;
+            margin-bottom: 20px;
+        }
+        .tabindex-label {
+            display: inline-block;
+            background-color: #ff9800;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>タブオーダーチェック</h1>
+
+    <div class="info">
+        <strong>📌 使い方：</strong><br>
+        このページでは、Tabキーを押してフォーカスの移動順序を確認できます。<br>
+        Shift + Tab で逆方向に移動します。
+    </div>
+
+    <!-- テストページへのリンク -->
+    <div class="section" style="background-color: #e8f5e9;">
+        <h2 style="border-bottom-color: #4caf50;">ビジネスアプリケーション形式のテストページ</h2>
+        <p style="margin-bottom: 20px;">実際のビジネスアプリケーションを想定した、顧客情報入力フォームでタブオーダーをテストできます。</p>
+
+        <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+            <a href="ordered.html" style="flex: 1; min-width: 250px; padding: 20px; background-color: white; border: 2px solid #27ae60; border-radius: 8px; text-align: center; text-decoration: none; transition: transform 0.2s;">
+                <div style="font-size: 18px; font-weight: bold; color: #27ae60; margin-bottom: 10px;">✓ タブオーダー整列</div>
+                <div style="color: #555; font-size: 14px;">タブオーダーが正しく設定されたページ</div>
+                <div style="color: #777; font-size: 12px; margin-top: 8px;">（左→右、上→下の自然な順序）</div>
+            </a>
+
+            <a href="disorder.html" style="flex: 1; min-width: 250px; padding: 20px; background-color: white; border: 2px solid #e74c3c; border-radius: 8px; text-align: center; text-decoration: none; transition: transform 0.2s;">
+                <div style="font-size: 18px; font-weight: bold; color: #e74c3c; margin-bottom: 10px;">✗ タブオーダー不整列</div>
+                <div style="color: #555; font-size: 14px;">タブオーダーが不自然なページ</div>
+                <div style="color: #777; font-size: 12px; margin-top: 8px;">（後から追加した要素で順序が乱れている）</div>
+            </a>
+        </div>
+
+        <div style="margin-top: 20px; padding: 15px; background-color: #fff3e0; border-left: 4px solid #ff9800; border-radius: 4px;">
+            <strong style="color: #f57c00;">💡 テストのポイント：</strong>
+            <ul style="margin: 10px 0; padding-left: 20px; color: #555;">
+                <li>両ページは見た目が全く同じですが、tabindexの設定が異なります</li>
+                <li>ordered.html では mabl のタブオーダーチェックスニペットが成功します</li>
+                <li>disorder.html では mabl のタブオーダーチェックスニペットが失敗します</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 自然な順序のセクション -->
+    <div class="section">
+        <h2>セクション1: 自然な順序（tabindex未指定）</h2>
+
+        <div class="form-group">
+            <label for="name">名前:</label>
+            <input type="text" id="name" placeholder="山田太郎">
+        </div>
+
+        <div class="form-group">
+            <label for="email">メールアドレス:</label>
+            <input type="email" id="email" placeholder="example@test.com">
+        </div>
+
+        <div class="form-group">
+            <label for="tel">電話番号:</label>
+            <input type="tel" id="tel" placeholder="03-1234-5678">
+        </div>
+
+        <div class="form-group">
+            <label for="age">年齢:</label>
+            <input type="number" id="age" placeholder="30">
+        </div>
+
+        <div class="form-group">
+            <button type="button">送信</button>
+            <button type="button">キャンセル</button>
+        </div>
+    </div>
+
+    <!-- カスタム順序のセクション -->
+    <div class="section custom-order">
+        <h2>セクション2: カスタム順序（tabindex指定あり）</h2>
+        <p>⚠️ このセクションではtabindexで意図的に順序を変更しています</p>
+
+        <div class="form-group">
+            <label for="field1">フィールド 1:</label>
+            <input type="text" id="field1" tabindex="1" placeholder="最初にフォーカス">
+            <span class="tabindex-label">tabindex=1</span>
+        </div>
+
+        <div class="form-group">
+            <label for="field3">フィールド 3:</label>
+            <input type="text" id="field3" tabindex="3" placeholder="3番目にフォーカス">
+            <span class="tabindex-label">tabindex=3</span>
+        </div>
+
+        <div class="form-group">
+            <label for="field2">フィールド 2:</label>
+            <input type="text" id="field2" tabindex="2" placeholder="2番目にフォーカス">
+            <span class="tabindex-label">tabindex=2</span>
+        </div>
+
+        <div class="form-group">
+            <button type="button" tabindex="4">実行</button>
+            <span class="tabindex-label">tabindex=4</span>
+        </div>
+    </div>
+
+    <!-- 複合要素のセクション -->
+    <div class="section">
+        <h2>セクション3: 複合要素</h2>
+
+        <div class="form-group">
+            <label for="country">国:</label>
+            <select id="country">
+                <option value="">選択してください</option>
+                <option value="jp">日本</option>
+                <option value="us">アメリカ</option>
+                <option value="uk">イギリス</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>性別:</label>
+            <input type="radio" id="male" name="gender" value="male">
+            <label for="male" style="width: auto;">男性</label>
+            <input type="radio" id="female" name="gender" value="female">
+            <label for="female" style="width: auto;">女性</label>
+            <input type="radio" id="other" name="gender" value="other">
+            <label for="other" style="width: auto;">その他</label>
+        </div>
+
+        <div class="form-group">
+            <label>趣味:</label>
+            <input type="checkbox" id="hobby1" value="sports">
+            <label for="hobby1" style="width: auto;">スポーツ</label>
+            <input type="checkbox" id="hobby2" value="reading">
+            <label for="hobby2" style="width: auto;">読書</label>
+            <input type="checkbox" id="hobby3" value="music">
+            <label for="hobby3" style="width: auto;">音楽</label>
+        </div>
+
+        <div class="form-group">
+            <label for="message">メッセージ:</label>
+            <textarea id="message" rows="4" placeholder="ご自由にお書きください"></textarea>
+        </div>
+
+        <div class="form-group">
+            <button type="submit">送信する</button>
+            <button type="reset">リセット</button>
+            <button type="button">戻る</button>
+        </div>
+    </div>
+
+    <!-- リンクのセクション -->
+    <div class="section">
+        <h2>セクション4: リンクとボタン</h2>
+
+        <p>
+            <a href="#top">ページトップへ</a> |
+            <a href="../">ホームに戻る</a> |
+            <a href="https://example.com" target="_blank">外部リンク</a>
+        </p>
+
+        <div class="form-group">
+            <button type="button">ボタン A</button>
+            <button type="button">ボタン B</button>
+            <button type="button">ボタン C</button>
+        </div>
+    </div>
+
+    <!-- tabindex=0とtabindex=-1のテスト -->
+    <div class="section">
+        <h2>セクション5: 特殊なtabindex値</h2>
+
+        <div class="form-group">
+            <div tabindex="0" style="padding: 10px; border: 2px solid #3498db; border-radius: 4px; display: inline-block;">
+                通常はフォーカス不可の要素（divタグ）
+                <span class="tabindex-label">tabindex=0</span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <button type="button" tabindex="-1">
+                フォーカス不可のボタン
+                <span class="tabindex-label" style="background-color: #666;">tabindex=-1</span>
+            </button>
+        </div>
+
+        <div class="form-group">
+            <input type="text" placeholder="通常のテキストボックス">
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="../" style="font-size: 16px;">← トップページに戻る</a>
+    </div>
+</body>
+</html>

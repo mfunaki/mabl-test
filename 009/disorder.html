@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>タブオーダー不整列 - 顧客情報入力フォーム</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.full-width {
+            flex: none;
+            width: 100%;
+        }
+        label {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-size: 14px;
+        }
+        label.required::after {
+            content: " *";
+            color: #e74c3c;
+        }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        select,
+        textarea {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus,
+        button:focus {
+            outline: 2px solid #e74c3c;
+            outline-offset: 2px;
+            border-color: #e74c3c;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+            font-family: inherit;
+        }
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 8px;
+        }
+        .radio-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .radio-item input[type="radio"] {
+            margin: 0;
+        }
+        .radio-item label {
+            margin: 0;
+            font-weight: normal;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: flex-end;
+        }
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button.primary {
+            background-color: #3498db;
+            color: white;
+        }
+        button.primary:hover {
+            background-color: #2980b9;
+        }
+        button.secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+        button.secondary:hover {
+            background-color: #7f8c8d;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+        .badge {
+            display: inline-block;
+            background-color: #e74c3c;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>顧客情報入力フォーム <span class="badge">タブオーダー不整列</span></h1>
+        <p class="subtitle">お客様の情報をご入力ください。必須項目には * が付いています。</p>
+
+        <form>
+            <!-- 行1: 会社名 -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="company" class="required">会社名</label>
+                    <input type="text" id="company" name="company" tabindex="1" placeholder="株式会社サンプル">
+                </div>
+            </div>
+
+            <!-- 行2: 担当者名、部署（部署は後から追加された想定） -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="name" class="required">担当者名</label>
+                    <input type="text" id="name" name="name" tabindex="2" placeholder="山田 太郎">
+                </div>
+                <div class="form-group">
+                    <label for="department">部署</label>
+                    <!-- 部署フィールドは後から追加されたため、tabindexが飛んでいる -->
+                    <input type="text" id="department" name="department" tabindex="18" placeholder="営業部">
+                </div>
+            </div>
+
+            <!-- 行3: メールアドレス、電話番号 -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email" class="required">メールアドレス</label>
+                    <input type="email" id="email" name="email" tabindex="3" placeholder="yamada@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="phone" class="required">電話番号</label>
+                    <input type="tel" id="phone" name="phone" tabindex="4" placeholder="03-1234-5678">
+                </div>
+            </div>
+
+            <!-- 行4: 郵便番号、都道府県（住所セクションは後から追加された想定） -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="zipcode">郵便番号</label>
+                    <!-- 住所関連フィールドは後から追加されたため、tabindexが後ろの方に -->
+                    <input type="text" id="zipcode" name="zipcode" tabindex="19" placeholder="100-0001">
+                </div>
+                <div class="form-group">
+                    <label for="prefecture">都道府県</label>
+                    <select id="prefecture" name="prefecture" tabindex="20">
+                        <option value="">選択してください</option>
+                        <option value="tokyo">東京都</option>
+                        <option value="osaka">大阪府</option>
+                        <option value="kanagawa">神奈川県</option>
+                        <option value="aichi">愛知県</option>
+                        <option value="hokkaido">北海道</option>
+                        <option value="fukuoka">福岡県</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 行5: 市区町村 -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="city">市区町村</label>
+                    <input type="text" id="city" name="city" tabindex="21" placeholder="千代田区丸の内">
+                </div>
+            </div>
+
+            <!-- 行6: 番地・建物名 -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="address">番地・建物名</label>
+                    <input type="text" id="address" name="address" tabindex="22" placeholder="1-1-1 サンプルビル 5F">
+                </div>
+            </div>
+
+            <!-- 行7: 業種、従業員数（従業員数は後から追加された想定） -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="industry" class="required">業種</label>
+                    <select id="industry" name="industry" tabindex="5">
+                        <option value="">選択してください</option>
+                        <option value="it">IT・情報通信</option>
+                        <option value="manufacturing">製造業</option>
+                        <option value="retail">小売業</option>
+                        <option value="finance">金融・保険</option>
+                        <option value="service">サービス業</option>
+                        <option value="other">その他</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="employees">従業員数</label>
+                    <!-- 従業員数フィールドは後から追加されたため、tabindexが飛んでいる -->
+                    <select id="employees" name="employees" tabindex="23">
+                        <option value="">選択してください</option>
+                        <option value="1-10">1-10名</option>
+                        <option value="11-50">11-50名</option>
+                        <option value="51-100">51-100名</option>
+                        <option value="101-500">101-500名</option>
+                        <option value="501+">501名以上</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 行8: 興味のある製品（ラジオボタンの順序が不自然） -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label class="required">興味のある製品</label>
+                    <div class="radio-group">
+                        <div class="radio-item">
+                            <input type="radio" id="product-a" name="product" value="product-a" tabindex="8">
+                            <label for="product-a">製品A（基本プラン）</label>
+                        </div>
+                        <div class="radio-item">
+                            <!-- 製品Bは後から追加されたため、tabindexが飛んでいる -->
+                            <input type="radio" id="product-b" name="product" value="product-b" tabindex="24">
+                            <label for="product-b">製品B（スタンダード）</label>
+                        </div>
+                        <div class="radio-item">
+                            <input type="radio" id="product-c" name="product" value="product-c" tabindex="9">
+                            <label for="product-c">製品C（プレミアム）</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 行9: お問い合わせ内容 -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="message">お問い合わせ内容</label>
+                    <textarea id="message" name="message" tabindex="6" placeholder="ご質問やご要望などをご記入ください"></textarea>
+                </div>
+            </div>
+
+            <!-- ボタン（クリアボタンが送信ボタンより先にフォーカスされる不自然な設定） -->
+            <div class="button-group">
+                <button type="reset" class="secondary" tabindex="7">クリア</button>
+                <button type="submit" class="primary" tabindex="25">送信する</button>
+            </div>
+        </form>
+
+        <a href="./" class="back-link">← タブオーダーチェックのトップに戻る</a>
+    </div>
+</body>
+</html>
