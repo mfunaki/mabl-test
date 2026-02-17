@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>010 - ブラウザタイムゾーンチェック</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #555;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .info {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-left: 4px solid #4caf50;
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            width: 40%;
+        }
+        td {
+            font-family: monospace;
+            font-size: 15px;
+        }
+        .timezone-badge {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .offset-positive {
+            color: #27ae60;
+        }
+        .offset-negative {
+            color: #e74c3c;
+        }
+        .offset-zero {
+            color: #7f8c8d;
+        }
+        .world-clock {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .clock-card {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+        }
+        .clock-card.current {
+            border-color: #3498db;
+            background-color: #ebf5fb;
+        }
+        .clock-city {
+            font-weight: bold;
+            color: #333;
+            font-size: 14px;
+        }
+        .clock-time {
+            font-family: monospace;
+            font-size: 22px;
+            color: #2c3e50;
+            margin: 8px 0;
+        }
+        .clock-date {
+            font-size: 12px;
+            color: #777;
+        }
+        .clock-offset {
+            font-size: 11px;
+            color: #999;
+            margin-top: 4px;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        #live-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            background-color: #27ae60;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
+    <h1>ブラウザタイムゾーンチェック</h1>
+
+    <div class="info">
+        <strong>使い方：</strong><br>
+        このページでは、ブラウザが認識しているタイムゾーン情報を確認できます。<br>
+        各項目の値はJavaScriptの <code>Intl</code> API および <code>Date</code> オブジェクトから取得しています。
+    </div>
+
+    <textarea id="notes" rows="3" style="width: 100%; box-sizing: border-box; padding: 10px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; resize: vertical; margin-bottom: 20px;" placeholder="メモを入力できます..."></textarea>
+
+    <!-- 現在のタイムゾーン -->
+    <div class="section">
+        <h2>現在のタイムゾーン</h2>
+        <div style="text-align: center;">
+            <div class="timezone-badge" id="tz-name">--</div>
+        </div>
+        <table>
+            <tr>
+                <th>タイムゾーン名 (IANA)</th>
+                <td id="tz-iana">--</td>
+            </tr>
+            <tr>
+                <th>UTCオフセット</th>
+                <td id="tz-offset">--</td>
+            </tr>
+            <tr>
+                <th>オフセット (分)</th>
+                <td id="tz-offset-minutes">--</td>
+            </tr>
+            <tr>
+                <th>タイムゾーン略称</th>
+                <td id="tz-abbr">--</td>
+            </tr>
+            <tr>
+                <th>夏時間 (DST)</th>
+                <td id="tz-dst">--</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 現在の日時 -->
+    <div class="section">
+        <h2><span id="live-indicator"></span>現在の日時</h2>
+        <table>
+            <tr>
+                <th>ローカル日時</th>
+                <td id="dt-local">--</td>
+            </tr>
+            <tr>
+                <th>UTC日時</th>
+                <td id="dt-utc">--</td>
+            </tr>
+            <tr>
+                <th>ISO 8601形式</th>
+                <td id="dt-iso">--</td>
+            </tr>
+            <tr>
+                <th>Unixタイムスタンプ (秒)</th>
+                <td id="dt-unix">--</td>
+            </tr>
+            <tr>
+                <th>日本語表記</th>
+                <td id="dt-ja">--</td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- 世界時計 -->
+    <div class="section">
+        <h2>世界時計</h2>
+        <p>主要都市の現在時刻を表示しています。ブラウザのタイムゾーンに該当する都市は青枠で表示されます。</p>
+        <div class="world-clock" id="world-clock"></div>
+    </div>
+
+    <!-- ロケール情報 -->
+    <div class="section">
+        <h2>ロケール情報</h2>
+        <table>
+            <tr>
+                <th>ブラウザロケール</th>
+                <td id="locale-lang">--</td>
+            </tr>
+            <tr>
+                <th>優先言語一覧</th>
+                <td id="locale-languages">--</td>
+            </tr>
+            <tr>
+                <th>日付フォーマット例</th>
+                <td id="locale-date-format">--</td>
+            </tr>
+            <tr>
+                <th>数値フォーマット例</th>
+                <td id="locale-number-format">--</td>
+            </tr>
+            <tr>
+                <th>通貨フォーマット例</th>
+                <td id="locale-currency-format">--</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="../" style="font-size: 16px;">&larr; トップページに戻る</a>
+    </div>
+
+    <script>
+        const worldClockZones = [
+            { city: 'ロンドン', tz: 'Europe/London', flag: 'GB' },
+            { city: 'パリ', tz: 'Europe/Paris', flag: 'FR' },
+            { city: 'モスクワ', tz: 'Europe/Moscow', flag: 'RU' },
+            { city: 'ドバイ', tz: 'Asia/Dubai', flag: 'AE' },
+            { city: '東京', tz: 'Asia/Tokyo', flag: 'JP' },
+            { city: 'シドニー', tz: 'Australia/Sydney', flag: 'AU' },
+            { city: 'オークランド', tz: 'Pacific/Auckland', flag: 'NZ' },
+            { city: 'ロサンゼルス', tz: 'America/Los_Angeles', flag: 'US' },
+            { city: 'デンバー', tz: 'America/Denver', flag: 'US' },
+            { city: 'シカゴ', tz: 'America/Chicago', flag: 'US' },
+            { city: 'ニューヨーク', tz: 'America/New_York', flag: 'US' },
+            { city: 'サンパウロ', tz: 'America/Sao_Paulo', flag: 'BR' },
+        ];
+
+        function getTimezoneAbbreviation(date) {
+            const parts = new Intl.DateTimeFormat('en-US', { timeZoneName: 'short' }).formatToParts(date);
+            const tzPart = parts.find(p => p.type === 'timeZoneName');
+            return tzPart ? tzPart.value : '--';
+        }
+
+        function isDST(date) {
+            const jan = new Date(date.getFullYear(), 0, 1).getTimezoneOffset();
+            const jul = new Date(date.getFullYear(), 6, 1).getTimezoneOffset();
+            const current = date.getTimezoneOffset();
+            if (jan === jul) return 'N/A（夏時間なし）';
+            return current < Math.max(jan, jul) ? 'はい（夏時間適用中）' : 'いいえ（標準時）';
+        }
+
+        function formatOffset(minutes) {
+            const sign = minutes <= 0 ? '+' : '-';
+            const abs = Math.abs(minutes);
+            const h = String(Math.floor(abs / 60)).padStart(2, '0');
+            const m = String(abs % 60).padStart(2, '0');
+            return `UTC${sign}${h}:${m}`;
+        }
+
+        function updateTimezoneInfo() {
+            const now = new Date();
+            const iana = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            const offsetMinutes = now.getTimezoneOffset();
+            const offsetStr = formatOffset(offsetMinutes);
+
+            document.getElementById('tz-name').textContent = iana;
+            document.getElementById('tz-iana').textContent = iana;
+            document.getElementById('tz-offset').textContent = offsetStr;
+
+            const offsetCell = document.getElementById('tz-offset');
+            if (offsetMinutes < 0) offsetCell.classList.add('offset-positive');
+            else if (offsetMinutes > 0) offsetCell.classList.add('offset-negative');
+            else offsetCell.classList.add('offset-zero');
+
+            document.getElementById('tz-offset-minutes').textContent = String(-offsetMinutes);
+            document.getElementById('tz-abbr').textContent = getTimezoneAbbreviation(now);
+            document.getElementById('tz-dst').textContent = isDST(now);
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+
+            document.getElementById('dt-local').textContent = now.toLocaleString('ja-JP', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false
+            });
+            document.getElementById('dt-utc').textContent = now.toLocaleString('ja-JP', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: false,
+                timeZone: 'UTC'
+            });
+            document.getElementById('dt-iso').textContent = now.toISOString();
+            document.getElementById('dt-unix').textContent = Math.floor(now.getTime() / 1000);
+            document.getElementById('dt-ja').textContent = now.toLocaleString('ja-JP-u-ca-japanese', {
+                era: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                weekday: 'long', hour: '2-digit', minute: '2-digit', second: '2-digit',
+                hour12: true
+            });
+        }
+
+        function updateWorldClock() {
+            const container = document.getElementById('world-clock');
+            const now = new Date();
+            const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            container.innerHTML = '';
+            worldClockZones.forEach(zone => {
+                const card = document.createElement('div');
+                card.className = 'clock-card' + (zone.tz === localTz ? ' current' : '');
+
+                const time = now.toLocaleTimeString('ja-JP', {
+                    timeZone: zone.tz,
+                    hour: '2-digit', minute: '2-digit', second: '2-digit',
+                    hour12: false
+                });
+                const date = now.toLocaleDateString('ja-JP', {
+                    timeZone: zone.tz,
+                    month: 'short', day: 'numeric', weekday: 'short'
+                });
+
+                const formatter = new Intl.DateTimeFormat('en-US', {
+                    timeZone: zone.tz,
+                    timeZoneName: 'shortOffset'
+                });
+                const parts = formatter.formatToParts(now);
+                const offsetPart = parts.find(p => p.type === 'timeZoneName');
+                const offsetLabel = offsetPart ? offsetPart.value : '';
+
+                card.innerHTML = `
+                    <div class="clock-city">${zone.city}${zone.tz === localTz ? ' (現在地)' : ''}</div>
+                    <div class="clock-time">${time}</div>
+                    <div class="clock-date">${date}</div>
+                    <div class="clock-offset">${zone.tz} (${offsetLabel})</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function updateLocaleInfo() {
+            const lang = navigator.language;
+            const languages = navigator.languages ? navigator.languages.join(', ') : lang;
+
+            document.getElementById('locale-lang').textContent = lang;
+            document.getElementById('locale-languages').textContent = languages;
+
+            const now = new Date();
+            document.getElementById('locale-date-format').textContent =
+                new Intl.DateTimeFormat(lang, { dateStyle: 'full' }).format(now);
+            document.getElementById('locale-number-format').textContent =
+                new Intl.NumberFormat(lang).format(1234567.89);
+            document.getElementById('locale-currency-format').textContent =
+                new Intl.NumberFormat(lang, { style: 'currency', currency: 'JPY' }).format(1234567);
+        }
+
+        // 初期表示
+        updateTimezoneInfo();
+        updateDateTime();
+        updateWorldClock();
+        updateLocaleInfo();
+
+        // 毎秒更新
+        setInterval(() => {
+            updateDateTime();
+            updateWorldClock();
+        }, 1000);
+    </script>
+</body>
+</html>
