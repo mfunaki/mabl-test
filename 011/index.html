@@ -29,9 +29,18 @@
             border-bottom: 2px solid #3498db;
             padding-bottom: 10px;
         }
-        .section h3 {
+        .input-group {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            background-color: #fdfdfd;
+        }
+        .input-group > legend {
+            font-size: 16px;
+            font-weight: bold;
             color: #666;
-            margin-top: 20px;
+            padding: 0 8px;
         }
         .info {
             background-color: #e8f5e9;
@@ -245,38 +254,44 @@
         <h2>日付入力</h2>
 
         <!-- 1. カレンダーから日付を設定 -->
-        <h3>1. カレンダーから日付を設定</h3>
-        <div class="form-row">
-            <label for="date-calendar">日付:</label>
-            <input type="date" id="date-calendar">
-        </div>
-        <div class="result" id="result-calendar"></div>
+        <fieldset class="input-group">
+            <legend>1. カレンダーから日付を設定</legend>
+            <div class="form-row">
+                <label for="date-calendar">日付:</label>
+                <input type="date" id="date-calendar">
+            </div>
+            <div class="result" id="result-calendar"></div>
+        </fieldset>
 
         <!-- 2. 月・日をリストボックスから選択 -->
-        <h3>2. 月・日をリストボックスから選択</h3>
-        <div class="form-row">
-            <label for="select-month">月:</label>
-            <select id="select-month">
-                <option value="">--</option>
-            </select>
-            <label for="select-day">日:</label>
-            <select id="select-day">
-                <option value="">--</option>
-            </select>
-        </div>
-        <div class="result" id="result-select-date"></div>
+        <fieldset class="input-group">
+            <legend>2. 月・日をリストボックスから選択</legend>
+            <div class="form-row">
+                <label for="select-month">月:</label>
+                <select id="select-month">
+                    <option value="">--</option>
+                </select>
+                <label for="select-day">日:</label>
+                <select id="select-day">
+                    <option value="">--</option>
+                </select>
+            </div>
+            <div class="result" id="result-select-date"></div>
+        </fieldset>
 
         <!-- 3. ウィジェットから月・日を選択 -->
-        <h3>3. ウィジェットから月・日を選択</h3>
-        <div class="date-widget" id="date-widget">
-            <div class="date-widget-header">
-                <button type="button" id="dw-prev-month" aria-label="前の月">&laquo;</button>
-                <span id="dw-month-label"></span>
-                <button type="button" id="dw-next-month" aria-label="次の月">&raquo;</button>
+        <fieldset class="input-group">
+            <legend>3. ウィジェットから月・日を選択</legend>
+            <div class="date-widget" id="date-widget">
+                <div class="date-widget-header">
+                    <button type="button" id="dw-prev-month" aria-label="前の月">&laquo;</button>
+                    <span id="dw-month-label"></span>
+                    <button type="button" id="dw-next-month" aria-label="次の月">&raquo;</button>
+                </div>
+                <div class="date-widget-days" id="dw-days"></div>
             </div>
-            <div class="date-widget-days" id="dw-days"></div>
-        </div>
-        <div class="result" id="result-widget-date"></div>
+            <div class="result" id="result-widget-date"></div>
+        </fieldset>
     </div>
 
     <!-- ===== 時刻入力セクション ===== -->
@@ -284,33 +299,37 @@
         <h2>時刻入力</h2>
 
         <!-- 1. 時・分をリストボックスから選択 -->
-        <h3>1. 時・分をリストボックスから選択</h3>
-        <div class="form-row">
-            <label for="select-hour">時:</label>
-            <select id="select-hour">
-                <option value="">--</option>
-            </select>
-            <label for="select-minute">分:</label>
-            <select id="select-minute">
-                <option value="">--</option>
-            </select>
-        </div>
-        <div class="result" id="result-select-time"></div>
+        <fieldset class="input-group">
+            <legend>1. 時・分をリストボックスから選択</legend>
+            <div class="form-row">
+                <label for="select-hour">時:</label>
+                <select id="select-hour">
+                    <option value="">--</option>
+                </select>
+                <label for="select-minute">分:</label>
+                <select id="select-minute">
+                    <option value="">--</option>
+                </select>
+            </div>
+            <div class="result" id="result-select-time"></div>
+        </fieldset>
 
         <!-- 2. ウィジェットから時・分を選択 -->
-        <h3>2. ウィジェットから時・分を選択</h3>
-        <div class="time-widget" id="time-widget">
-            <div class="time-widget-col">
-                <div class="time-widget-col-label">時</div>
-                <div class="time-widget-scroll" id="tw-hours"></div>
+        <fieldset class="input-group">
+            <legend>2. ウィジェットから時・分を選択</legend>
+            <div class="time-widget" id="time-widget">
+                <div class="time-widget-col">
+                    <div class="time-widget-col-label">時</div>
+                    <div class="time-widget-scroll" id="tw-hours"></div>
+                </div>
+                <div class="time-widget-separator">:</div>
+                <div class="time-widget-col">
+                    <div class="time-widget-col-label">分</div>
+                    <div class="time-widget-scroll" id="tw-minutes"></div>
+                </div>
             </div>
-            <div class="time-widget-separator">:</div>
-            <div class="time-widget-col">
-                <div class="time-widget-col-label">分</div>
-                <div class="time-widget-scroll" id="tw-minutes"></div>
-            </div>
-        </div>
-        <div class="result" id="result-widget-time"></div>
+            <div class="result" id="result-widget-time"></div>
+        </fieldset>
     </div>
 
     <div style="text-align: center; margin-top: 30px;">
