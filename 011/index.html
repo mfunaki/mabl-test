@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>011 - 日付・時刻入力</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #555;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .section h3 {
+            color: #666;
+            margin-top: 20px;
+        }
+        .info {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-left: 4px solid #4caf50;
+            margin-bottom: 20px;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #eaf4fc;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            font-size: 15px;
+            color: #2c3e50;
+            min-height: 20px;
+        }
+        .result:empty::before {
+            content: '（未選択）';
+            color: #aaa;
+        }
+        select {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+            cursor: pointer;
+        }
+        select:focus {
+            outline: 3px solid #3498db;
+            outline-offset: 2px;
+        }
+        input[type="date"],
+        input[type="time"] {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input[type="date"]:focus,
+        input[type="time"]:focus {
+            outline: 3px solid #3498db;
+            outline-offset: 2px;
+        }
+        label {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        /* カスタム日付ウィジェット */
+        .date-widget {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            display: inline-block;
+            user-select: none;
+        }
+        .date-widget-header {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .date-widget-header button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 0 8px;
+            line-height: 1;
+        }
+        .date-widget-header button:hover {
+            opacity: 0.8;
+        }
+        .date-widget-header span {
+            font-weight: bold;
+            font-size: 15px;
+        }
+        .date-widget-days {
+            display: grid;
+            grid-template-columns: repeat(7, 40px);
+            gap: 2px;
+            padding: 8px;
+            background-color: #fafafa;
+        }
+        .date-widget-days .day-header {
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #888;
+            padding: 4px 0;
+        }
+        .date-widget-days .day-header:first-child {
+            color: #e74c3c;
+        }
+        .date-widget-days .day-header:last-child {
+            color: #3498db;
+        }
+        .date-widget-days .day-cell {
+            text-align: center;
+            padding: 8px 0;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .date-widget-days .day-cell:hover {
+            background-color: #ebf5fb;
+        }
+        .date-widget-days .day-cell.selected {
+            background-color: #3498db;
+            color: white;
+        }
+        .date-widget-days .day-cell.empty {
+            cursor: default;
+        }
+        .date-widget-days .day-cell.sunday {
+            color: #e74c3c;
+        }
+        .date-widget-days .day-cell.saturday {
+            color: #3498db;
+        }
+        .date-widget-days .day-cell.selected.sunday,
+        .date-widget-days .day-cell.selected.saturday {
+            color: white;
+        }
+
+        /* カスタム時刻ウィジェット */
+        .time-widget {
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: stretch;
+            background-color: #fafafa;
+        }
+        .time-widget-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .time-widget-col-label {
+            background-color: #3498db;
+            color: white;
+            font-weight: bold;
+            font-size: 13px;
+            padding: 6px 20px;
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .time-widget-scroll {
+            height: 180px;
+            overflow-y: auto;
+            width: 70px;
+        }
+        .time-widget-scroll .time-option {
+            text-align: center;
+            padding: 8px 0;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: monospace;
+        }
+        .time-widget-scroll .time-option:hover {
+            background-color: #ebf5fb;
+        }
+        .time-widget-scroll .time-option.selected {
+            background-color: #3498db;
+            color: white;
+        }
+        .time-widget-separator {
+            display: flex;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #555;
+            padding: 0 5px;
+            padding-top: 30px;
+        }
+
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>日付・時刻入力</h1>
+
+    <div class="info">
+        <strong>使い方：</strong><br>
+        このページでは、さまざまな方法で日付や時刻を入力できます。<br>
+        各入力方法で値を選択すると、その下に選択結果が表示されます。
+    </div>
+
+    <!-- ===== 日付入力セクション ===== -->
+    <div class="section">
+        <h2>日付入力</h2>
+
+        <!-- 1. カレンダーから日付を設定 -->
+        <h3>1. カレンダーから日付を設定</h3>
+        <div class="form-row">
+            <label for="date-calendar">日付:</label>
+            <input type="date" id="date-calendar">
+        </div>
+        <div class="result" id="result-calendar"></div>
+
+        <!-- 2. 月・日をリストボックスから選択 -->
+        <h3>2. 月・日をリストボックスから選択</h3>
+        <div class="form-row">
+            <label for="select-month">月:</label>
+            <select id="select-month">
+                <option value="">--</option>
+            </select>
+            <label for="select-day">日:</label>
+            <select id="select-day">
+                <option value="">--</option>
+            </select>
+        </div>
+        <div class="result" id="result-select-date"></div>
+
+        <!-- 3. ウィジェットから月・日を選択 -->
+        <h3>3. ウィジェットから月・日を選択</h3>
+        <div class="date-widget" id="date-widget">
+            <div class="date-widget-header">
+                <button type="button" id="dw-prev-month" aria-label="前の月">&laquo;</button>
+                <span id="dw-month-label"></span>
+                <button type="button" id="dw-next-month" aria-label="次の月">&raquo;</button>
+            </div>
+            <div class="date-widget-days" id="dw-days"></div>
+        </div>
+        <div class="result" id="result-widget-date"></div>
+    </div>
+
+    <!-- ===== 時刻入力セクション ===== -->
+    <div class="section">
+        <h2>時刻入力</h2>
+
+        <!-- 1. 時・分をリストボックスから選択 -->
+        <h3>1. 時・分をリストボックスから選択</h3>
+        <div class="form-row">
+            <label for="select-hour">時:</label>
+            <select id="select-hour">
+                <option value="">--</option>
+            </select>
+            <label for="select-minute">分:</label>
+            <select id="select-minute">
+                <option value="">--</option>
+            </select>
+        </div>
+        <div class="result" id="result-select-time"></div>
+
+        <!-- 2. ウィジェットから時・分を選択 -->
+        <h3>2. ウィジェットから時・分を選択</h3>
+        <div class="time-widget" id="time-widget">
+            <div class="time-widget-col">
+                <div class="time-widget-col-label">時</div>
+                <div class="time-widget-scroll" id="tw-hours"></div>
+            </div>
+            <div class="time-widget-separator">:</div>
+            <div class="time-widget-col">
+                <div class="time-widget-col-label">分</div>
+                <div class="time-widget-scroll" id="tw-minutes"></div>
+            </div>
+        </div>
+        <div class="result" id="result-widget-time"></div>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="../" style="font-size: 16px;">&larr; トップページに戻る</a>
+    </div>
+
+    <script>
+        // ===== ユーティリティ =====
+        function pad(n) {
+            return String(n).padStart(2, '0');
+        }
+
+        function formatDateResult(month, day) {
+            return pad(month) + '月' + pad(day) + '日が指定されました';
+        }
+
+        function formatTimeResult(hour, minute) {
+            return pad(hour) + '時' + pad(minute) + '分が指定されました';
+        }
+
+        function daysInMonth(month) {
+            // 閏年を考慮しない（2月は29日まで選択可能とする）
+            const days = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+            return days[month - 1];
+        }
+
+        // ===== 日付入力: 1. カレンダー =====
+        document.getElementById('date-calendar').addEventListener('change', function() {
+            if (this.value) {
+                const parts = this.value.split('-');
+                const month = parseInt(parts[1], 10);
+                const day = parseInt(parts[2], 10);
+                document.getElementById('result-calendar').textContent = formatDateResult(month, day);
+            } else {
+                document.getElementById('result-calendar').textContent = '';
+            }
+        });
+
+        // ===== 日付入力: 2. リストボックス =====
+        const selectMonth = document.getElementById('select-month');
+        const selectDay = document.getElementById('select-day');
+
+        // 月の選択肢を生成
+        for (let m = 1; m <= 12; m++) {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = m + '月';
+            selectMonth.appendChild(opt);
+        }
+
+        // 日の選択肢を更新
+        function updateDayOptions() {
+            const currentDay = selectDay.value;
+            const month = parseInt(selectMonth.value, 10);
+            const maxDay = month ? daysInMonth(month) : 31;
+
+            // 現在の選択肢数を確認して必要なら再構築
+            selectDay.innerHTML = '<option value="">--</option>';
+            for (let d = 1; d <= maxDay; d++) {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d + '日';
+                selectDay.appendChild(opt);
+            }
+
+            // 以前選択されていた日が範囲内なら復元
+            if (currentDay && parseInt(currentDay, 10) <= maxDay) {
+                selectDay.value = currentDay;
+            }
+        }
+
+        // 初期状態で31日まで生成
+        updateDayOptions();
+
+        selectMonth.addEventListener('change', function() {
+            updateDayOptions();
+            updateSelectDateResult();
+        });
+
+        selectDay.addEventListener('change', updateSelectDateResult);
+
+        function updateSelectDateResult() {
+            const m = selectMonth.value;
+            const d = selectDay.value;
+            if (m && d) {
+                document.getElementById('result-select-date').textContent = formatDateResult(parseInt(m, 10), parseInt(d, 10));
+            } else {
+                document.getElementById('result-select-date').textContent = '';
+            }
+        }
+
+        // ===== 日付入力: 3. カスタムウィジェット =====
+        const dwState = {
+            currentMonth: new Date().getMonth() + 1, // 1-12
+            selectedMonth: null,
+            selectedDay: null,
+        };
+
+        function renderDateWidget() {
+            const month = dwState.currentMonth;
+            document.getElementById('dw-month-label').textContent = month + '月';
+
+            const container = document.getElementById('dw-days');
+            container.innerHTML = '';
+
+            // 曜日ヘッダー
+            const dayNames = ['日', '月', '火', '水', '木', '金', '土'];
+            dayNames.forEach(name => {
+                const el = document.createElement('div');
+                el.className = 'day-header';
+                el.textContent = name;
+                container.appendChild(el);
+            });
+
+            // 今年の該当月の1日の曜日を取得
+            const year = new Date().getFullYear();
+            const firstDayOfWeek = new Date(year, month - 1, 1).getDay();
+            const maxDay = daysInMonth(month);
+
+            // 空白セル
+            for (let i = 0; i < firstDayOfWeek; i++) {
+                const el = document.createElement('div');
+                el.className = 'day-cell empty';
+                container.appendChild(el);
+            }
+
+            // 日付セル
+            for (let d = 1; d <= maxDay; d++) {
+                const el = document.createElement('div');
+                el.className = 'day-cell';
+                el.textContent = d;
+
+                const dayOfWeek = (firstDayOfWeek + d - 1) % 7;
+                if (dayOfWeek === 0) el.classList.add('sunday');
+                if (dayOfWeek === 6) el.classList.add('saturday');
+
+                if (dwState.selectedMonth === month && dwState.selectedDay === d) {
+                    el.classList.add('selected');
+                }
+
+                el.addEventListener('click', function() {
+                    dwState.selectedMonth = month;
+                    dwState.selectedDay = d;
+                    renderDateWidget();
+                    document.getElementById('result-widget-date').textContent = formatDateResult(month, d);
+                });
+
+                container.appendChild(el);
+            }
+        }
+
+        document.getElementById('dw-prev-month').addEventListener('click', function() {
+            dwState.currentMonth = dwState.currentMonth <= 1 ? 12 : dwState.currentMonth - 1;
+            renderDateWidget();
+        });
+
+        document.getElementById('dw-next-month').addEventListener('click', function() {
+            dwState.currentMonth = dwState.currentMonth >= 12 ? 1 : dwState.currentMonth + 1;
+            renderDateWidget();
+        });
+
+        renderDateWidget();
+
+        // ===== 時刻入力: 1. リストボックス =====
+        const selectHour = document.getElementById('select-hour');
+        const selectMinute = document.getElementById('select-minute');
+
+        for (let h = 0; h <= 23; h++) {
+            const opt = document.createElement('option');
+            opt.value = h;
+            opt.textContent = pad(h) + '時';
+            selectHour.appendChild(opt);
+        }
+
+        for (let m = 0; m <= 59; m++) {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = pad(m) + '分';
+            selectMinute.appendChild(opt);
+        }
+
+        selectHour.addEventListener('change', updateSelectTimeResult);
+        selectMinute.addEventListener('change', updateSelectTimeResult);
+
+        function updateSelectTimeResult() {
+            const h = selectHour.value;
+            const m = selectMinute.value;
+            if (h !== '' && m !== '') {
+                document.getElementById('result-select-time').textContent = formatTimeResult(parseInt(h, 10), parseInt(m, 10));
+            } else {
+                document.getElementById('result-select-time').textContent = '';
+            }
+        }
+
+        // ===== 時刻入力: 2. カスタムウィジェット =====
+        const twState = {
+            selectedHour: null,
+            selectedMinute: null,
+        };
+
+        function renderTimeWidget() {
+            const hoursContainer = document.getElementById('tw-hours');
+            const minutesContainer = document.getElementById('tw-minutes');
+
+            hoursContainer.innerHTML = '';
+            minutesContainer.innerHTML = '';
+
+            for (let h = 0; h <= 23; h++) {
+                const el = document.createElement('div');
+                el.className = 'time-option';
+                if (twState.selectedHour === h) el.classList.add('selected');
+                el.textContent = pad(h);
+                el.addEventListener('click', function() {
+                    twState.selectedHour = h;
+                    renderTimeWidget();
+                    updateWidgetTimeResult();
+                });
+                hoursContainer.appendChild(el);
+            }
+
+            for (let m = 0; m <= 59; m++) {
+                const el = document.createElement('div');
+                el.className = 'time-option';
+                if (twState.selectedMinute === m) el.classList.add('selected');
+                el.textContent = pad(m);
+                el.addEventListener('click', function() {
+                    twState.selectedMinute = m;
+                    renderTimeWidget();
+                    updateWidgetTimeResult();
+                });
+                minutesContainer.appendChild(el);
+            }
+
+            // 選択済みの要素が見えるようにスクロール
+            if (twState.selectedHour !== null) {
+                const selectedHourEl = hoursContainer.querySelector('.selected');
+                if (selectedHourEl) selectedHourEl.scrollIntoView({ block: 'center' });
+            }
+            if (twState.selectedMinute !== null) {
+                const selectedMinuteEl = minutesContainer.querySelector('.selected');
+                if (selectedMinuteEl) selectedMinuteEl.scrollIntoView({ block: 'center' });
+            }
+        }
+
+        function updateWidgetTimeResult() {
+            if (twState.selectedHour !== null && twState.selectedMinute !== null) {
+                document.getElementById('result-widget-time').textContent =
+                    formatTimeResult(twState.selectedHour, twState.selectedMinute);
+            } else {
+                document.getElementById('result-widget-time').textContent = '';
+            }
+        }
+
+        renderTimeWidget();
+    </script>
+</body>
+</html>
