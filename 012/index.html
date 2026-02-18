@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>012 - ファイルダウンロード</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .section {
+            background-color: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .section h2 {
+            color: #555;
+            margin-top: 0;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .input-group {
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 15px 0;
+            background-color: #fdfdfd;
+        }
+        .input-group > legend {
+            font-size: 16px;
+            font-weight: bold;
+            color: #666;
+            padding: 0 8px;
+        }
+        .info {
+            background-color: #e8f5e9;
+            padding: 15px;
+            border-left: 4px solid #4caf50;
+            margin-bottom: 20px;
+        }
+        .description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #eaf4fc;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            font-size: 15px;
+            color: #2c3e50;
+            min-height: 20px;
+        }
+        .result:empty::before {
+            content: '（未実行）';
+            color: #aaa;
+        }
+        a.download-link {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            margin: 5px 8px 5px 0;
+            transition: background-color 0.2s;
+        }
+        a.download-link:hover {
+            background-color: #2980b9;
+        }
+        button.download-btn {
+            padding: 10px 20px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            margin: 5px 8px 5px 0;
+            transition: background-color 0.2s;
+        }
+        button.download-btn:hover {
+            background-color: #219a52;
+        }
+        canvas {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            display: block;
+            margin: 10px 0;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+        textarea:focus {
+            outline: 3px solid #3498db;
+            outline-offset: 2px;
+        }
+        .form-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        label {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        input[type="text"] {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        input[type="text"]:focus {
+            outline: 3px solid #3498db;
+            outline-offset: 2px;
+        }
+        a.back-link {
+            color: #3498db;
+            text-decoration: none;
+        }
+        a.back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>ファイルダウンロード</h1>
+
+    <div class="info">
+        <strong>使い方：</strong><br>
+        このページでは、さまざまな方法でファイルをダウンロードできます。<br>
+        各ダウンロード方法を試して、ブラウザの挙動の違いを確認してください。
+    </div>
+
+    <!-- ===== リンクによるダウンロード ===== -->
+    <div class="section">
+        <h2>リンクによるダウンロード</h2>
+
+        <fieldset class="input-group">
+            <legend>1. リンククリックによる自動ダウンロード</legend>
+            <p class="description">
+                リンクに <code>download</code> 属性が付与されており、クリックするとファイル名がURLのパスから決定され、自動的にダウンロードが開始されます。ブラウザのファイル保存ダイアログは表示されません。
+            </p>
+            <a href="files/sample.txt" download class="download-link" id="link-txt">テキストファイル (sample.txt)</a>
+            <a href="files/sample.csv" download class="download-link" id="link-csv">CSVファイル (sample.csv)</a>
+            <div class="result" id="result-link"></div>
+        </fieldset>
+
+        <fieldset class="input-group">
+            <legend>2. Data URIによるダウンロード</legend>
+            <p class="description">
+                ファイルの内容がリンク自体に埋め込まれています（Data URI形式）。サーバー上にファイルが存在しなくても、リンクをクリックするだけでダウンロードされます。
+            </p>
+            <a href="data:text/plain;charset=utf-8,%E3%81%93%E3%82%8C%E3%81%AFData%20URI%E3%81%8B%E3%82%89%E7%94%9F%E6%88%90%E3%81%95%E3%82%8C%E3%81%9F%E3%83%95%E3%82%A1%E3%82%A4%E3%83%AB%E3%81%A7%E3%81%99%E3%80%82" download="data-uri-sample.txt" class="download-link" id="link-datauri">Data URIテキスト (data-uri-sample.txt)</a>
+            <div class="result" id="result-datauri"></div>
+        </fieldset>
+    </div>
+
+    <!-- ===== ボタンによるダウンロード ===== -->
+    <div class="section">
+        <h2>ボタンによるダウンロード</h2>
+
+        <fieldset class="input-group">
+            <legend>3. Blob生成によるダウンロード</legend>
+            <p class="description">
+                ボタンをクリックすると、JavaScriptで Blob オブジェクトを生成し、<code>URL.createObjectURL()</code> を使用してダウンロードリンクを動的に作成します。ブラウザの設定によっては保存ダイアログが表示されます。
+            </p>
+            <button type="button" class="download-btn" id="btn-blob-txt" onclick="downloadBlob('text')">テキストファイルを生成してダウンロード</button>
+            <button type="button" class="download-btn" id="btn-blob-json" onclick="downloadBlob('json')">JSONファイルを生成してダウンロード</button>
+            <div class="result" id="result-blob"></div>
+        </fieldset>
+
+        <fieldset class="input-group">
+            <legend>4. Canvas画像のエクスポート</legend>
+            <p class="description">
+                Canvas要素に描画された内容をPNG画像としてダウンロードします。ブラウザ上で動的に生成された画像をファイルとして保存する方式です。
+            </p>
+            <canvas id="download-canvas" width="300" height="150"></canvas>
+            <button type="button" class="download-btn" id="btn-canvas" onclick="downloadCanvas()">Canvas画像をPNGでダウンロード</button>
+            <div class="result" id="result-canvas"></div>
+        </fieldset>
+
+        <fieldset class="input-group">
+            <legend>5. フォーム入力内容のダウンロード</legend>
+            <p class="description">
+                テキストエリアに入力した内容を、指定したファイル名でダウンロードします。ユーザーが作成したコンテンツをファイルとして保存する方式です。
+            </p>
+            <div class="form-row">
+                <label for="input-filename">ファイル名:</label>
+                <input type="text" id="input-filename" value="my-note.txt" size="20">
+            </div>
+            <textarea id="input-content" placeholder="ここにテキストを入力してください...">これはテスト用のテキストです。
+自由に編集してダウンロードできます。</textarea>
+            <div style="margin-top: 10px;">
+                <button type="button" class="download-btn" id="btn-form" onclick="downloadFormContent()">入力内容をダウンロード</button>
+            </div>
+            <div class="result" id="result-form"></div>
+        </fieldset>
+    </div>
+
+    <div style="text-align: center; margin-top: 30px;">
+        <a href="../" class="back-link" style="font-size: 16px;">&larr; トップページに戻る</a>
+    </div>
+
+    <script>
+        // ===== 1. リンククリック検知 =====
+        document.getElementById('link-txt').addEventListener('click', function() {
+            document.getElementById('result-link').textContent = 'sample.txt のダウンロードを開始しました';
+        });
+        document.getElementById('link-csv').addEventListener('click', function() {
+            document.getElementById('result-link').textContent = 'sample.csv のダウンロードを開始しました';
+        });
+
+        // ===== 2. Data URIクリック検知 =====
+        document.getElementById('link-datauri').addEventListener('click', function() {
+            document.getElementById('result-datauri').textContent = 'data-uri-sample.txt のダウンロードを開始しました';
+        });
+
+        // ===== 3. Blob生成によるダウンロード =====
+        function downloadBlob(type) {
+            var content, filename, mimeType;
+
+            if (type === 'text') {
+                content = 'これはJavaScriptのBlobから生成されたテキストファイルです。\n生成日時: ' + new Date().toLocaleString('ja-JP');
+                filename = 'blob-generated.txt';
+                mimeType = 'text/plain';
+            } else {
+                content = JSON.stringify({
+                    message: 'これはJavaScriptのBlobから生成されたJSONファイルです',
+                    generatedAt: new Date().toISOString(),
+                    items: [
+                        { id: 1, name: 'テストデータ1' },
+                        { id: 2, name: 'テストデータ2' },
+                        { id: 3, name: 'テストデータ3' }
+                    ]
+                }, null, 2);
+                filename = 'blob-generated.json';
+                mimeType = 'application/json';
+            }
+
+            var blob = new Blob([content], { type: mimeType + ';charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            document.getElementById('result-blob').textContent = filename + ' のダウンロードを開始しました';
+        }
+
+        // ===== 4. Canvas画像のエクスポート =====
+        function initCanvas() {
+            var canvas = document.getElementById('download-canvas');
+            var ctx = canvas.getContext('2d');
+
+            // 背景
+            ctx.fillStyle = '#ecf0f1';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // グラデーション矩形
+            var gradient = ctx.createLinearGradient(20, 20, 280, 130);
+            gradient.addColorStop(0, '#3498db');
+            gradient.addColorStop(1, '#2ecc71');
+            ctx.fillStyle = gradient;
+            ctx.roundRect(20, 20, 260, 110, 10);
+            ctx.fill();
+
+            // テキスト
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('mabl-test', 150, 65);
+            ctx.font = '14px Arial';
+            ctx.fillText('Canvas画像エクスポート', 150, 95);
+        }
+
+        initCanvas();
+
+        function downloadCanvas() {
+            var canvas = document.getElementById('download-canvas');
+            var link = document.createElement('a');
+            link.download = 'canvas-export.png';
+            link.href = canvas.toDataURL('image/png');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            document.getElementById('result-canvas').textContent = 'canvas-export.png のダウンロードを開始しました';
+        }
+
+        // ===== 5. フォーム入力内容のダウンロード =====
+        function downloadFormContent() {
+            var content = document.getElementById('input-content').value;
+            var filename = document.getElementById('input-filename').value || 'download.txt';
+
+            if (!content) {
+                document.getElementById('result-form').textContent = 'エラー: テキストが入力されていません';
+                return;
+            }
+
+            var blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+            var url = URL.createObjectURL(blob);
+            var a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            document.getElementById('result-form').textContent = filename + ' のダウンロードを開始しました';
+        }
+    </script>
+</body>
+</html>
