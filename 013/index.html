@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>013 - 勤怠管理</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .container {
+            margin: 40px auto;
+            max-width: 1000px;
+            padding: 30px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background-color: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .back-link:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+            padding: 12px 8px;
+            text-align: center;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+        td {
+            border: 1px solid #ddd;
+            padding: 6px 4px;
+            text-align: center;
+            vertical-align: middle;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 6px 4px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border: 2px solid #3498db;
+        }
+        .col-year   { width: 70px; }
+        .col-month  { width: 50px; }
+        .col-day    { width: 50px; }
+        .col-start  { width: 90px; }
+        .col-end    { width: 90px; }
+        .col-comment { width: auto; }
+        .col-work   { width: 100px; }
+        .work-time {
+            font-weight: bold;
+            color: #27ae60;
+            font-size: 14px;
+        }
+        .work-time.error {
+            color: #e74c3c;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        .add-row-btn {
+            margin-top: 16px;
+            padding: 10px 24px;
+            background-color: #27ae60;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .add-row-btn:hover {
+            background-color: #219a52;
+        }
+        .delete-btn {
+            padding: 4px 10px;
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .delete-btn:hover {
+            background-color: #c0392b;
+        }
+        .note {
+            margin-top: 20px;
+            padding: 12px 16px;
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+            border-radius: 4px;
+            font-size: 13px;
+            color: #555;
+        }
+        footer {
+            margin-top: 30px;
+            padding: 10px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+<header>mabl-test</header>
+
+<div class="container">
+    <a href="../" class="back-link">← メニューへ戻る</a>
+    <h1>013 - 勤怠管理</h1>
+
+    <table id="attendance-table" data-testid="attendance-table">
+        <thead>
+            <tr>
+                <th class="col-year">年</th>
+                <th class="col-month">月</th>
+                <th class="col-day">日</th>
+                <th class="col-start">開始時間</th>
+                <th class="col-end">終了時間</th>
+                <th class="col-comment">コメント</th>
+                <th class="col-work">労働時間</th>
+                <th style="width:60px;"></th>
+            </tr>
+        </thead>
+        <tbody id="attendance-body">
+        </tbody>
+    </table>
+
+    <button class="add-row-btn" onclick="addRow()" data-testid="add-row-btn">＋ 行を追加</button>
+
+    <div class="note">
+        <strong>労働時間の計算ルール:</strong><br>
+        ・12時（正午）をまたぐ場合は1時間を休憩として差し引きます。<br>
+        ・18時（夕方）をまたぐ場合は1時間を休憩として差し引きます。<br>
+        ・例: 08:30〜20:00 → 実働時間 11.5h（13.5h - 2h休憩）
+    </div>
+</div>
+
+<footer>&copy; 2025 mabl-test. All rights reserved.</footer>
+
+<script>
+    var rowCount = 0;
+
+    function addRow() {
+        rowCount++;
+        var tbody = document.getElementById('attendance-body');
+        var tr = document.createElement('tr');
+        tr.setAttribute('data-testid', 'attendance-row-' + rowCount);
+        tr.innerHTML =
+            '<td class="col-year">' +
+                '<input type="text" placeholder="2016" data-testid="input-year-' + rowCount + '" oninput="calcWork(this)">' +
+            '</td>' +
+            '<td class="col-month">' +
+                '<input type="text" placeholder="03" data-testid="input-month-' + rowCount + '" oninput="calcWork(this)">' +
+            '</td>' +
+            '<td class="col-day">' +
+                '<input type="text" placeholder="05" data-testid="input-day-' + rowCount + '" oninput="calcWork(this)">' +
+            '</td>' +
+            '<td class="col-start">' +
+                '<input type="text" placeholder="08:30" data-testid="input-start-' + rowCount + '" oninput="calcWork(this)">' +
+            '</td>' +
+            '<td class="col-end">' +
+                '<input type="text" placeholder="20:00" data-testid="input-end-' + rowCount + '" oninput="calcWork(this)">' +
+            '</td>' +
+            '<td class="col-comment">' +
+                '<input type="text" placeholder="コメントを入力" data-testid="input-comment-' + rowCount + '">' +
+            '</td>' +
+            '<td class="col-work">' +
+                '<span class="work-time" data-testid="work-time-' + rowCount + '">-</span>' +
+            '</td>' +
+            '<td>' +
+                '<button class="delete-btn" onclick="deleteRow(this)" data-testid="delete-row-' + rowCount + '">削除</button>' +
+            '</td>';
+        tbody.appendChild(tr);
+    }
+
+    function deleteRow(btn) {
+        var tr = btn.closest('tr');
+        tr.parentNode.removeChild(tr);
+    }
+
+    function parseTime(str) {
+        // "08:30", "8:30", "0830" などに対応
+        str = str.trim();
+        var m;
+        if ((m = str.match(/^(\d{1,2}):(\d{2})$/))) {
+            return { h: parseInt(m[1], 10), min: parseInt(m[2], 10) };
+        }
+        if ((m = str.match(/^(\d{2})(\d{2})$/))) {
+            return { h: parseInt(m[1], 10), min: parseInt(m[2], 10) };
+        }
+        return null;
+    }
+
+    function toMinutes(t) {
+        return t.h * 60 + t.min;
+    }
+
+    function formatWorkTime(totalMinutes) {
+        var h = Math.floor(totalMinutes / 60);
+        var m = totalMinutes % 60;
+        if (m === 0) return h + 'h';
+        return h + 'h ' + m + 'm';
+    }
+
+    function calcWork(input) {
+        var tr = input.closest('tr');
+        var startInput = tr.querySelector('[data-testid^="input-start-"]');
+        var endInput   = tr.querySelector('[data-testid^="input-end-"]');
+        var workSpan   = tr.querySelector('[data-testid^="work-time-"]');
+
+        var startVal = startInput ? startInput.value : '';
+        var endVal   = endInput   ? endInput.value   : '';
+
+        if (!startVal || !endVal) {
+            workSpan.textContent = '-';
+            workSpan.className = 'work-time';
+            return;
+        }
+
+        var start = parseTime(startVal);
+        var end   = parseTime(endVal);
+
+        if (!start || !end) {
+            workSpan.textContent = '形式エラー';
+            workSpan.className = 'work-time error';
+            return;
+        }
+
+        if (start.h < 0 || start.h > 23 || start.min < 0 || start.min > 59 ||
+            end.h   < 0 || end.h   > 23 || end.min   < 0 || end.min   > 59) {
+            workSpan.textContent = '値エラー';
+            workSpan.className = 'work-time error';
+            return;
+        }
+
+        var startMin = toMinutes(start);
+        var endMin   = toMinutes(end);
+
+        if (endMin <= startMin) {
+            workSpan.textContent = '時間エラー';
+            workSpan.className = 'work-time error';
+            return;
+        }
+
+        var workMin = endMin - startMin;
+
+        // 12時をまたぐ場合: 1時間休憩を差し引く
+        var noon = 12 * 60;
+        if (startMin < noon && endMin > noon) {
+            workMin -= 60;
+        }
+
+        // 18時をまたぐ場合: 1時間休憩を差し引く
+        var evening = 18 * 60;
+        if (startMin < evening && endMin > evening) {
+            workMin -= 60;
+        }
+
+        if (workMin <= 0) {
+            workSpan.textContent = '0h';
+            workSpan.className = 'work-time';
+            return;
+        }
+
+        workSpan.textContent = formatWorkTime(workMin);
+        workSpan.className = 'work-time';
+    }
+
+    // 初期1行を追加
+    addRow();
+</script>
+
+</body>
+</html>
