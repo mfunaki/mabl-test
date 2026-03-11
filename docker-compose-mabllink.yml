@@ -1,0 +1,18 @@
+services:
+  web:
+    build: .
+    container_name: mabl-test
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+
+  mabl-link:
+    image: mablhq/link-agent
+    platform: linux/amd64
+    container_name: mabl-link-agent
+    restart: unless-stopped
+    command:
+      - --api-key
+      - ${MABL_LINK_API_KEY}
+      - --name
+      - ${MABL_LINK_AGENT_NAME}
